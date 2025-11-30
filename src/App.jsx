@@ -1,8 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+const STORAGE_KEY = 'todoList'
 
 function App() {
-  const [todos, setTodos] = useState([])
+  // 从 localStorage 读取初始数据
+  const [todos, setTodos] = useState(() => {
+    const savedTodos = localStorage.getItem(STORAGE_KEY)
+    return savedTodos ? JSON.parse(savedTodos) : []
+  })
   const [inputValue, setInputValue] = useState('')
+
+  // 每当 todos 变化时，自动保存到 localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
+  }, [todos])
 
   // 添加任务
   const addTodo = () => {
