@@ -7,9 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:8000',
         changeOrigin: true,
-        // 如果需要重写路径，可以取消下面的注释
+        // FastAPI 的路径不需要重写，/api 会继续传递到后端
         // rewrite: (path) => path.replace(/^\/api/, '')
       },
     },
