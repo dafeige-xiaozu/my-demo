@@ -1,0 +1,15 @@
+# 部署配置文件
+
+# 服务器信息
+SERVER_IP=182.92.82.185
+SERVER_USER=root
+SSH_KEY=$HOME/Desktop/MyMac.pem
+SERVER_APP_DIR=/root/todo-app
+
+# 应用配置
+GITHUB_REPO=https://github.com/dafeige-xiaozu/my-demo.git
+FRONTEND_PORT=5173
+BACKEND_PORT=3001
+
+# 构建配置
+NODE_ENV=production

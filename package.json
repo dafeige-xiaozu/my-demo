@@ -8,7 +8,8 @@
     "server": "cd server && npm start",
     "client": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "bash deploy.sh"
   },
   "dependencies": {
     "react": "^18.2.0",
