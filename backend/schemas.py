@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Union
 from datetime import datetime
 
 
@@ -33,6 +33,6 @@ class TodoResponse(TodoBase):
 class ApiResponse(BaseModel):
     """API 通用响应模式"""
     success: bool
-    data: Optional[dict | list] = None
+    data: Optional[Union[dict, list]] = None
     message: Optional[str] = None
     error: Optional[str] = None
