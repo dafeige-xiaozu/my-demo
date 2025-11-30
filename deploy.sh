@@ -51,34 +51,44 @@ else
   exit 1
 fi
 
-# 步骤3：安装后端依赖
-echo -e "${YELLOW}[3/4] 安装后端依赖...${NC}"
+# 步骤3：安装 Python 依赖
+echo -e "${YELLOW}[3/5] 安装 Python 依赖...${NC}"
 ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
-  cd /root/todo-app/server
-  npm install --production
+  cd /root/todo-app
+  pip install -r requirements.txt -q
 EOF
 
 if [ $? -eq 0 ]; then
-  echo -e "${GREEN}✅ 后端依赖安装成功${NC}"
+  echo -e "${GREEN}✅ Python 依赖安装成功${NC}"
 else
-  echo -e "${RED}❌ 后端依赖安装失败${NC}"
+  echo -e "${RED}❌ Python 依赖安装失败${NC}"
   exit 1
 fi
 
-# 步骤4：启动应用（使用 PM2 或 nohup）
-echo -e "${YELLOW}[4/4] 启动应用...${NC}"
+# 步骤4：配置前端代理
+echo -e "${YELLOW}[4/5] 配置 Nginx 反向代理...${NC}"
 ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
-  cd /root/todo-app/server
+  # 不在这里配置 nginx，需要手动配置
+echo "✅ 需要手动配置 Nginx。代理设置子第二步。"
+EOF
+
+# 步骤5：启动应用（使用 PM2 或 nohup）
+echo -e "${YELLOW}[5/5] 启动应用...${NC}"
+ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" << 'EOF'
+  cd /root/todo-app
   
   # 如果已安装 PM2，使用 PM2 启动
   if command -v pm2 &> /dev/null; then
-    pm2 delete todo-server 2>/dev/null || true
-    pm2 start index.js --name "todo-server" --env production
+    pm2 delete todo-backend 2>/dev/null || true
+    pm2 start "python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000" --name "todo-backend" --env production
+    pm2 delete todo-frontend 2>/dev/null || true
+    pm2 serve dist 5173 --name "todo-frontend" --spa 2>/dev/null || true
     pm2 save
     echo "✅ 使用 PM2 启动服务"
   else
     # 否则使用 nohup 启动
-    nohup npm start > /root/todo-app/server.log 2>&1 &
+    nohup python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 > /root/todo-app/backend.log 2>&1 &
+    nohup python -m http.server 5173 --directory /root/todo-app/dist > /root/todo-app/frontend.log 2>&1 &
     echo "✅ 使用 nohup 启动服务"
   fi
 EOF
@@ -93,5 +103,8 @@ fi
 echo -e "${GREEN}================================${NC}"
 echo -e "${GREEN}✅ 部署完成！${NC}"
 echo -e "${GREEN}================================${NC}"
-echo -e "服务器地址: http://182.92.82.185:3001/api/todos"
-echo -e "前端地址: http://182.92.82.185:5173 (如果配置了 nginx)"
+echo -e "后端地址: http://182.92.82.185:8000"
+echo -e "后端 API: http://182.92.82.185:8000/api/todos"
+echo -e "前端地址: http://182.92.82.185:5173 (需要 nginx 配置)"
+echo -e "配置 npm 脚本: npm run deploy"
+echo -e "\n接下来需要手动配置 Nginx。运行 bash aliyun-nginx-setup.sh"
