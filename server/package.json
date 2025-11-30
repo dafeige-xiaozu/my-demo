@@ -1,0 +1,17 @@
+{
+  "name": "todo-api-server",
+  "version": "1.0.0",
+  "description": "Todo List API Server",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "better-sqlite3": "^9.0.0"
+  },
+  "devDependencies": {}
+}
